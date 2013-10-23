@@ -357,3 +357,34 @@ function espresso_custom_template_vector_maps(){
 		return strtolower($state);
 	}
 }
+
+/**
+ * hook into PUE updates
+ */
+//Update notifications
+add_action('action_hook_espresso_template_vector_map_update_api', 'espresso_template_vector_map_load_pue_update');
+function espresso_template_vector_map_load_pue_update() {
+	global $org_options, $espresso_check_for_updates;
+	if ( $espresso_check_for_updates == false )
+		return;
+		
+	if (file_exists(EVENT_ESPRESSO_PLUGINFULLPATH . 'class/pue/pue-client.php')) { //include the file 
+		require(EVENT_ESPRESSO_PLUGINFULLPATH . 'class/pue/pue-client.php' );
+		$api_key = $org_options['site_license_key'];
+		$host_server_url = 'http://eventespresso.com';
+		$plugin_slug = array(
+			'premium' => array('p'=> 'espresso-template-vector-maps'),
+			'prerelease' => array('b'=> 'espresso-template-vector-maps-pr')
+			);
+		$options = array(
+			'apikey' => $api_key,
+			'lang_domain' => 'event_espresso',
+			'checkPeriod' => '24',
+			'option_key' => 'site_license_key',
+			'options_page_slug' => 'event_espresso',
+			'plugin_basename' => plugin_basename(__FILE__),
+			'use_wp_update' => FALSE
+		);
+		$check_for_updates = new PluginUpdateEngineChecker($host_server_url, $plugin_slug, $options); //initiate the class and start the plugin update engine!
+	}
+}
