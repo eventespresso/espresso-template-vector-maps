@@ -114,8 +114,11 @@ function espresso_custom_template_vector_maps(){
 			$externalURL 		= $event->externalURL;
 			$registration_url 	= !empty($externalURL) ? $externalURL : espresso_reg_url($event->id);
 			$live_button 		= '<a id="a_register_link-'.$event->id.'" href="'.$registration_url.'"><img class="buytix_button" src="'.WP_PLUGIN_URL. '/'.plugin_basename(dirname(__FILE__)).'/register-now.png" alt="Buy Tickets"></a>';
-			$open_spots 		= apply_filters('filter_hook_espresso_get_num_available_spaces', $event->id);
-
+			if ( ! has_filter( 'filter_hook_espresso_get_num_available_spaces' ) ){
+				$open_spots		= apply_filters('filter_hook_espresso_get_num_available_spaces', $event->id); //Available in 3.1.37
+			}else{
+				$open_spots		= get_number_of_attendees_reg_limit($event->id, 'number_available_spaces');
+			}
 			//This line changes the button text to display "Closed" if the attendee limit is reached.
 			if ( $open_spots < 1 || event_espresso_get_status($event->id) == 'NOT_ACTIVE' ) { $live_button = '<img class="buytix_button" src="'.WP_PLUGIN_URL. '/'.plugin_basename(dirname(__FILE__)).'/closed.png" alt="Buy Tickets">';  }
 
